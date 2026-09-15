@@ -15,11 +15,12 @@ st.set_page_config(
 )
 
 # Data loading (cached so it doesn't reload on every filter interaction)
+import os
 @st.cache_data
 def load_data():
-    df = pd.read_csv("global_economic_indicators.csv")
-    return df
-df = load_data()
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, "global_economic_indicators.csv")
+    return pd.read_csv(csv_path)
 
 # Sidebar — Filters
 st.sidebar.header("Filters")
