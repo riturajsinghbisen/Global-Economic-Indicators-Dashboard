@@ -36,7 +36,10 @@ st.sidebar.header("Filters")
 if st.sidebar.button("↺ Reset filters"):
     for key in ("continent_filter", "country_filter", "year_filter"):
         st.session_state.pop(key, None)
-    st.rerun()
+    try:
+        st.rerun()
+    except AttributeError:
+        st.experimental_rerun()
 # Filter 1: Continent (multi-select)
 continents = sorted(df["Continent"].unique())
 selected_continents = st.sidebar.multiselect(
