@@ -33,17 +33,19 @@ def human_number(n, prefix=""):
     return f"{prefix}{n:,.0f}"
 # Sidebar — Filters
 st.sidebar.header("Filters")
+
+if "reset_counter" not in st.session_state:
+    st.session_state.reset_counter = 0
+
 if st.sidebar.button("↺ Reset filters"):
-    for key in ("continent_filter", "country_filter", "year_filter"):
-        st.session_state.pop(key, None)
-    try:
-        st.rerun()
-    except AttributeError:
-        st.experimental_rerun()
+    st.session_state.reset_counter += 1
+    st.rerun()
+
+fk = st.session_state.reset_counter  # suffix added to widget keys so reset always starts fresh
 # Filter 1: Continent (multi-select)
 continents = sorted(df["Continent"].unique())
 selected_continents = st.sidebar.multiselect(
-    "Continent", options=continents, default=continents, key="continent_filter"
+    "Continent", options=continents, default=continents, key=f"continent_filter_{fk}"
 )
 # Narrow the country list down based on continent selection
 countries_available = sorted(
@@ -53,13 +55,13 @@ countries_available = sorted(
 default_countries = [c for c in ["India", "United States", "China", "Germany", "Brazil"]
                       if c in countries_available] or countries_available[:5]
 selected_countries = st.sidebar.multiselect(
-    "Country", options=countries_available, default=default_countries, key="country_filter"
+    "Country", options=countries_available, default=default_countries, key=f"country_filter_{fk}"
 )
 # Filter 3: Year range (slider)
 min_year, max_year = int(df["Year"].min()), int(df["Year"].max())
 year_range = st.sidebar.slider(
     "Year range", min_value=min_year, max_value=max_year,
-    value=(2010, max_year), step=1, key="year_filter"
+    value=(2010, max_year), step=1, key=f"year_filter_{fk}"
 )
 st.sidebar.markdown("---")
 with st.sidebar.expander("ℹ️ About this dashboard"):
