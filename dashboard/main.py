@@ -150,15 +150,32 @@ fig_map = px.choropleth(
     labels={"GDP_per_capita_USD": "GDP per Capita (US$)"},
 )
 st.plotly_chart(fig_map, use_container_width=True)
-# Visualization 3: Bar chart — top countries by GDP per capita, most recent year
-st.subheader(f"Top Countries by GDP per Capita ({latest_year})")
-top_n = latest.sort_values("GDP_per_capita_USD", ascending=False).head(10)
-fig_bar = px.bar(
-    top_n,
-    x="Country Name", y="GDP_per_capita_USD", color="Continent",
-    labels={"GDP_per_capita_USD": "GDP per Capita (US$)"},
-)
-st.plotly_chart(fig_bar, use_container_width=True)
+# Visualization 3 & 4: Bar chart + Bubble scatter, side by side
+col_left, col_right = st.columns(2)
+
+with col_left:
+    st.subheader(f"Top Countries by GDP per Capita ({latest_year})")
+    top_n = latest.sort_values("GDP_per_capita_USD", ascending=False).head(10)
+    fig_bar = px.bar(
+        top_n,
+        x="Country Name", y="GDP_per_capita_USD", color="Continent",
+        labels={"GDP_per_capita_USD": "GDP per Capita (US$)"},
+    )
+    fig_bar.update_layout(xaxis_tickangle=-40, legend_title_text="")
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+with col_right:
+    st.subheader(f"GDP per Capita vs Inflation ({latest_year})")
+    fig_bubble = px.scatter(
+        latest.dropna(subset=["Inflation_Pct"]),
+        x="Inflation_Pct", y="GDP_per_capita_USD",
+        size="Population", color="Continent",
+        hover_name="Country Name",
+        size_max=45,
+        labels={"Inflation_Pct": "Inflation (%)", "GDP_per_capita_USD": "GDP per Capita (US$)"},
+    )
+    fig_bubble.update_layout(legend_title_text="")
+    st.plotly_chart(fig_bubble, use_container_width=True)
 # Raw data (optional, collapsible)
 with st.expander("View filtered raw data"):
     st.dataframe(filtered.reset_index(drop=True), use_container_width=True)
