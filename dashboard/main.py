@@ -33,10 +33,14 @@ def human_number(n, prefix=""):
     return f"{prefix}{n:,.0f}"
 # Sidebar — Filters
 st.sidebar.header("Filters")
+if st.sidebar.button("↺ Reset filters"):
+    for key in ("continent_filter", "country_filter", "year_filter"):
+        st.session_state.pop(key, None)
+    st.rerun()
 # Filter 1: Continent (multi-select)
 continents = sorted(df["Continent"].unique())
 selected_continents = st.sidebar.multiselect(
-    "Continent", options=continents, default=continents
+    "Continent", options=continents, default=continents, key="continent_filter"
 )
 # Narrow the country list down based on continent selection
 countries_available = sorted(
@@ -46,19 +50,22 @@ countries_available = sorted(
 default_countries = [c for c in ["India", "United States", "China", "Germany", "Brazil"]
                       if c in countries_available] or countries_available[:5]
 selected_countries = st.sidebar.multiselect(
-    "Country", options=countries_available, default=default_countries
+    "Country", options=countries_available, default=default_countries, key="country_filter"
 )
 # Filter 3: Year range (slider)
 min_year, max_year = int(df["Year"].min()), int(df["Year"].max())
 year_range = st.sidebar.slider(
     "Year range", min_value=min_year, max_value=max_year,
-    value=(2010, max_year), step=1
+    value=(2010, max_year), step=1, key="year_filter"
 )
 st.sidebar.markdown("---")
-st.sidebar.caption(
-    "Data: World Bank (GDP, Population, Inflation), 2000–2022. "
-    "Sourced via github.com/datasets."
-)
+with st.sidebar.expander("ℹ️ About this dashboard"):
+    st.write(
+        "Data: World Bank indicators (GDP, Population, Inflation), 2000–2022, "
+        "212 countries. Sourced via the community-maintained "
+        "[datasets](https://github.com/datasets) GitHub organization "
+        "(original data from the World Bank)."
+    )
 # Apply filters
 mask = (
     df["Continent"].isin(selected_continents)
@@ -75,10 +82,6 @@ if filtered.empty:
 latest_year = filtered["Year"].max()
 latest = filtered[filtered["Year"] == latest_year]
 prev = filtered[filtered["Year"] == latest_year - 1]
-
-avg_gdp_per_capita = latest["GDP_per_capita_USD"].mean()
-avg_inflation = latest["Inflation_Pct"].mean()
-total_population = latest["Population"].sum()
 
 avg_gdp_per_capita = latest["GDP_per_capita_USD"].mean()
 avg_inflation = latest["Inflation_Pct"].mean()
