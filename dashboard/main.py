@@ -22,6 +22,18 @@ def load_data():
     csv_path = os.path.join(script_dir, "global_economic_indicators.csv")
     return pd.read_csv(csv_path)
 df=load_data()
+with st.expander("📊 Dataset Overview"):
+    st.write(f"**Rows:** {df.shape[0]:,} &nbsp;&nbsp; **Columns:** {df.shape[1]}")
+    st.write(f"**Countries covered:** {df['Country Name'].nunique()} &nbsp;&nbsp; "
+             f"**Years:** {int(df['Year'].min())}–{int(df['Year'].max())}")
+    overview = pd.DataFrame({
+        "Column": df.columns,
+        "Data Type": df.dtypes.astype(str).values,
+        "Missing Values": df.isna().sum().values,
+    })
+    st.dataframe(overview, use_container_width=True, hide_index=True)
+    st.caption("First 5 rows:")
+    st.dataframe(df.head(), use_container_width=True)
 # Human-readable number formatting for KPI cards (e.g. $2.40B instead of $2,400,000,000)
 def human_number(n, prefix=""):
     if pd.isna(n):
