@@ -66,7 +66,7 @@ mask = (
     & df["Year"].between(year_range[0], year_range[1])
 )
 filtered = df[mask]
-st.title("🌍 Global Economic Indicators Dashboard")
+st.title("Global Economic Indicators Dashboard")
 st.caption("Design and build an interactive dashboard for dynamic data visualization and filtering of datasets.")
 if filtered.empty:
     st.warning("No data matches the current filters. Try widening your selection.")
@@ -77,11 +77,39 @@ latest = filtered[filtered["Year"] == latest_year]
 avg_gdp_per_capita = latest["GDP_per_capita_USD"].mean()
 avg_inflation = latest["Inflation_Pct"].mean()
 total_population = latest["Population"].sum()
+latest = filtered[filtered["Year"] == latest_year]
+prev = filtered[filtered["Year"] == latest_year - 1]
+
+avg_gdp_per_capita = latest["GDP_per_capita_USD"].mean()
+avg_inflation = latest["Inflation_Pct"].mean()
+total_population = latest["Population"].sum()
+
+prev_gdp_per_capita = prev["GDP_per_capita_USD"].mean() if not prev.empty else None
+prev_inflation = prev["Inflation_Pct"].mean() if not prev.empty else None
+prev_population = prev["Population"].sum() if not prev.empty else None
+
+def pct_delta(curr, prev):
+    if prev in (None, 0) or pd.isna(prev) or pd.isna(curr):
+        return None
+    return f"{(curr - prev) / prev * 100:+.1f}%"
+
 kpi1, kpi2, kpi3 = st.columns(3)
-kpi1.metric(f"Avg GDP per Capita ({latest_year})", f"${avg_gdp_per_capita:,.0f}")
-kpi2.metric(f"Avg Inflation % ({latest_year})",
-            f"{avg_inflation:.2f}%" if pd.notna(avg_inflation) else "N/A")
-kpi3.metric(f"Total Population ({latest_year})", f"{total_population:,.0f}")
+kpi1.metric(
+    f"Avg GDP per Capita ({latest_year})",
+    human_number(avg_gdp_per_capita, "$"),
+    delta=pct_delta(avg_gdp_per_capita, prev_gdp_per_capita),
+)
+kpi2.metric(
+    f"Avg Inflation % ({latest_year})",
+    f"{avg_inflation:.2f}%" if pd.notna(avg_inflation) else "N/A",
+    delta=pct_delta(avg_inflation, prev_inflation),
+    delta_color="inverse",
+)
+kpi3.metric(
+    f"Total Population ({latest_year})",
+    human_number(total_population),
+    delta=pct_delta(total_population, prev_population),
+)
 st.markdown("---")
 # Visualization 1: Line chart — GDP per capita trend over years
 st.subheader("GDP per Capita Over Time")
