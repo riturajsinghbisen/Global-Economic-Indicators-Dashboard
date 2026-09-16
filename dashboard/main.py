@@ -74,11 +74,11 @@ if filtered.empty:
 # KPI cards — based on the most recent year within the selected range
 latest_year = filtered["Year"].max()
 latest = filtered[filtered["Year"] == latest_year]
+prev = filtered[filtered["Year"] == latest_year - 1]
+
 avg_gdp_per_capita = latest["GDP_per_capita_USD"].mean()
 avg_inflation = latest["Inflation_Pct"].mean()
 total_population = latest["Population"].sum()
-latest = filtered[filtered["Year"] == latest_year]
-prev = filtered[filtered["Year"] == latest_year - 1]
 
 avg_gdp_per_capita = latest["GDP_per_capita_USD"].mean()
 avg_inflation = latest["Inflation_Pct"].mean()
