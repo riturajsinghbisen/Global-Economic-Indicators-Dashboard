@@ -22,6 +22,15 @@ def load_data():
     csv_path = os.path.join(script_dir, "global_economic_indicators.csv")
     return pd.read_csv(csv_path)
 df=load_data()
+# Human-readable number formatting for KPI cards (e.g. $2.40B instead of $2,400,000,000)
+def human_number(n, prefix=""):
+    if pd.isna(n):
+        return "N/A"
+    abs_n = abs(n)
+    for unit, div in (("T", 1e12), ("B", 1e9), ("M", 1e6), ("K", 1e3)):
+        if abs_n >= div:
+            return f"{prefix}{n / div:,.2f}{unit}"
+    return f"{prefix}{n:,.0f}"
 # Sidebar — Filters
 st.sidebar.header("Filters")
 # Filter 1: Continent (multi-select)
