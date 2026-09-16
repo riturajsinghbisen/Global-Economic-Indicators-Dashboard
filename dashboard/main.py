@@ -161,4 +161,10 @@ fig_bar = px.bar(
 st.plotly_chart(fig_bar, use_container_width=True)
 # Raw data (optional, collapsible)
 with st.expander("View filtered raw data"):
-    st.dataframe(filtered.reset_index(drop=True))
+    st.dataframe(filtered.reset_index(drop=True), use_container_width=True)
+    st.download_button(
+        "⬇️ Download filtered data as CSV",
+        data=filtered.to_csv(index=False).encode("utf-8"),
+        file_name=f"global_econ_indicators_filtered_{latest_year}.csv",
+        mime="text/csv",
+    )
