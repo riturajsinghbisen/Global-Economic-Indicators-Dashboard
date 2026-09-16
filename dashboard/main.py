@@ -113,6 +113,10 @@ def pct_delta(curr, prev):
         return None
     return f"{(curr - prev) / prev * 100:+.1f}%"
 
+# KPI 4: country currently leading in GDP per capita
+top_row = latest.dropna(subset=["GDP_per_capita_USD"]).sort_values("GDP_per_capita_USD", ascending=False).head(1)
+top_country_name = top_row["Country Name"].values[0] if not top_row.empty else "N/A"
+top_country_value = top_row["GDP_per_capita_USD"].values[0] if not top_row.empty else None
 kpi1, kpi2, kpi3 = st.columns(3)
 kpi1.metric(
     f"Avg GDP per Capita ({latest_year})",
@@ -129,6 +133,12 @@ kpi3.metric(
     f"Total Population ({latest_year})",
     human_number(total_population),
     delta=pct_delta(total_population, prev_population),
+)
+kpi4.metric(
+    f"🏆 Top by GDP per Capita ({latest_year})",
+    top_country_name,
+    delta=human_number(top_country_value, "$") if top_country_value is not None else None,
+    delta_color="off",
 )
 st.markdown("---")
 # Visualization 1: Line chart — GDP per capita trend over years
