@@ -117,7 +117,7 @@ def pct_delta(curr, prev):
 top_row = latest.dropna(subset=["GDP_per_capita_USD"]).sort_values("GDP_per_capita_USD", ascending=False).head(1)
 top_country_name = top_row["Country Name"].values[0] if not top_row.empty else "N/A"
 top_country_value = top_row["GDP_per_capita_USD"].values[0] if not top_row.empty else None
-kpi1, kpi2, kpi3 = st.columns(3)
+kpi1, kpi2, kpi3, kpi4 = st.columns(3)
 kpi1.metric(
     f"Avg GDP per Capita ({latest_year})",
     human_number(avg_gdp_per_capita, "$"),
